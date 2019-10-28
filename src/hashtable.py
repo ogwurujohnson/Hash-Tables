@@ -51,9 +51,12 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        if self.count >= self.capacity:
+            self.resize()
 
-
+        new_item = LinkedPair(key, value)
+        self.storage[self.count] = new_item
+        self.count += 1
 
     def remove(self, key):
         '''
@@ -65,7 +68,6 @@ class HashTable:
         '''
         pass
 
-
     def retrieve(self, key):
         '''
         Retrieve the value stored with the given key.
@@ -74,8 +76,10 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
-
+        for n in self.storage:
+            if key == n.key:
+                return n.value
+        return None
 
     def resize(self):
         '''
@@ -84,7 +88,9 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        
+        self.storage.extend([None] * self.capacity)
+        self.capacity *= 2
 
 
 
