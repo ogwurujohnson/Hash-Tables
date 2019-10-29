@@ -137,9 +137,10 @@ class HashTable:
         Fill this in.
         '''
         index = self._hash_mod(key)
-        pair = self.storage[index]
-
-        if pair is None:
+        if self.storage[index]:
+            return self.storage[index].retrieve(key)
+        else:
+            print(f"Hash[{key}] is undefined")
             return None
         else:
             return self.storage[index].value
