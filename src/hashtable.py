@@ -108,11 +108,24 @@ class HashTable:
         Fill this in.
         '''
         index = self._hash_mod(key)
-        if self.storage[index] is None:
-            print('Warning: key not found')
+        # if there is nothing at our index, print our little error message and get out of there!
+        if not self.storage[index]:
+            print(f"Hash[{key}] cannot be deleted: It does not exist")
             return
-        
+        current_node = self.storage[index]
+        prev_node = None
+        # if there is only one node at this index and it has the key we want we just need to delete it, make the value at this index None
+        if current_node.key == key and not current_node.next:
         self.storage[index] = None
+        elif current_node.key == key:
+            self.storage[index] = self.storage[index].next
+        else:
+            while current_node:
+                if current_node.key == key:
+                    prev_node.next = current_node.next
+                    return
+                prev_node = current_node
+                current_node = current_node.next
         
 
     def retrieve(self, key):
