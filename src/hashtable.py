@@ -15,6 +15,14 @@ class LinkedPair:
         if self.next:
             next = self.next.key
         return f"{{key: {self.key}, value: {self.value}, next_key: {next}}}"
+    # append an item at the end of our linked pair chain. if the item exists overwrite it
+    def append(self, key, value):
+        if self.key == key:
+            self.value = value
+        elif not self.next:
+            self.next = LinkedPair(key, value)
+        else:
+            self.next.append(key, value)
 class HashTable:
     '''
     A hash table that with `capacity` buckets
