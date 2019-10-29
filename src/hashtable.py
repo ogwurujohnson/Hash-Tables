@@ -41,6 +41,20 @@ class HashTable:
         self.storage = [None] * capacity
         self.count = 0
 
+    def __str__(self):
+        hashT = {}
+        def append_to_hashT(element, hashT, index):
+            hashT[index].append(element)
+        for i in range(len(self.storage)):
+            hashT[i] = []
+            if self.storage[i]:
+                current_node = self.storage[i]
+                while current_node:
+                    hashT[i].append(current_node)
+                    current_node = current_node.next
+            else:
+                hashT[i] = None
+        return f"{hashT}"
 
     def _hash(self, key):
         '''
