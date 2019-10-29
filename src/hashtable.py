@@ -15,6 +15,7 @@ class HashTable:
     def __init__(self, capacity):
         self.capacity = capacity  # Number of buckets in the hash table
         self.storage = [None] * capacity
+        self.count = 0
 
 
     def _hash(self, key):
@@ -32,7 +33,10 @@ class HashTable:
 
         OPTIONAL STRETCH: Research and implement DJB2
         '''
-        pass
+        h = 5381
+        for k in key:
+            h = ((h << 5) + h) + ord(k)
+        return h%self.capacity
 
 
     def _hash_mod(self, key):
@@ -44,16 +48,13 @@ class HashTable:
 
 
     def insert(self, key, value):
-        '''
-        Store the value with the given key.
 
-        Hash collisions should be handled with Linked List Chaining.
+        index = self._hash_mod(key)
+        if self.storage[index] is not None:
+            print('warning: index collision')
+            return
 
-        Fill this in.
-        '''
-        pass
-
-
+        self.storage[index] = LinkedPair(key, value)
 
     def remove(self, key):
         '''
@@ -63,8 +64,13 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
-
+        index = self._hash_mod(key)
+        if self.storage[index] is None:
+            print('Warning: key not found')
+            return
+        
+        self.storage[index] = None
+        
 
     def retrieve(self, key):
         '''
@@ -74,17 +80,26 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        index = self._hash_mod(key)
+        pair = self.storage[index]
 
+        if pair is None:
+            return None
+        else:
+            return self.storage[index].value
 
     def resize(self):
-        '''
-        Doubles the capacity of the hash table and
-        rehash all key/value pairs.
+        self.capacity *= 2
+        new_storage = [None] * self.capacity
 
-        Fill this in.
-        '''
-        pass
+        for pair in self.storage:
+            if pair is not None:
+                new_index = self._hash_mod(pair.key)
+                new_storage[new_index] = pair
+
+        self.storage = new_storage
+
+        
 
 
 
