@@ -15,6 +15,7 @@ class LinkedPair:
         if self.next:
             next = self.next.key
         return f"{{key: {self.key}, value: {self.value}, next_key: {next}}}"
+    
     # append an item at the end of our linked pair chain. if the item exists overwrite it
     def append(self, key, value):
         if self.key == key:
@@ -23,6 +24,8 @@ class LinkedPair:
             self.next = LinkedPair(key, value)
         else:
             self.next.append(key, value)
+
+    # retrieve an item from our linked list chain
     def retrieve(self, key):
         if self.key == key:
             return self.value
@@ -31,6 +34,7 @@ class LinkedPair:
             return None
         else:
             return self.next.retrieve(key)
+
 class HashTable:
     '''
     A hash table that with `capacity` buckets
@@ -39,7 +43,6 @@ class HashTable:
     def __init__(self, capacity):
         self.capacity = capacity  # Number of buckets in the hash table
         self.storage = [None] * capacity
-        self.count = 0
 
     def __str__(self):
         hashT = {}
@@ -90,14 +93,15 @@ class HashTable:
         if not None in self.storage:
             self.resize()
         index = self._hash_mod(key)
-
+        
         # if we have something at the index, append this value. Using linkedpair.append will
         # overwrite a value already existing, and traverse over all the values
 
         if self.storage[index]:
             self.storage[index].append(key, value)
         else:
-        self.storage[index] = LinkedPair(key, value)
+            self.storage[index] = LinkedPair(key, value)
+       
 
     def remove(self, key):
         '''
@@ -116,7 +120,7 @@ class HashTable:
         prev_node = None
         # if there is only one node at this index and it has the key we want we just need to delete it, make the value at this index None
         if current_node.key == key and not current_node.next:
-        self.storage[index] = None
+            self.storage[index] = None
         elif current_node.key == key:
             self.storage[index] = self.storage[index].next
         else:
@@ -126,37 +130,27 @@ class HashTable:
                     return
                 prev_node = current_node
                 current_node = current_node.next
-        
+
 
     def retrieve(self, key):
-        '''
-        Retrieve the value stored with the given key.
-
-        Returns None if the key is not found.
-
-        Fill this in.
-        '''
         index = self._hash_mod(key)
         if self.storage[index]:
             return self.storage[index].retrieve(key)
         else:
             print(f"Hash[{key}] is undefined")
             return None
-        else:
-            return self.storage[index].value
 
     def resize(self):
         self.capacity *= 2
-        new_storage = [None] * self.capacity
+        old_storage = self.storage
+        self.storage = [None] * self.capacity
 
-        for pair in self.storage:
-            if pair is not None:
-                new_index = self._hash_mod(pair.key)
-                new_storage[new_index] = pair
-
-        self.storage = new_storage
-
-        
+        for node in old_storage:
+            if node:
+                current_node = node
+                while current_node:
+                    self.insert(current_node.key, current_node.value)
+                    current_node = current_node.next
 
 
 
