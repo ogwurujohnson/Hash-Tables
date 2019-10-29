@@ -7,6 +7,34 @@ class LinkedPair:
         self.value = value
         self.next = None
 
+    def __str__(self):
+        return f"{{{self.key}, {self.value}}}"
+    
+    def __repr__(self):
+        next = None
+        if self.next:
+            next = self.next.key
+        return f"{{key: {self.key}, value: {self.value}, next_key: {next}}}"
+    
+    # append an item at the end of our linked pair chain. if the item exists overwrite it
+    def append(self, key, value):
+        if self.key == key:
+            self.value = value
+        elif not self.next:
+            self.next = LinkedPair(key, value)
+        else:
+            self.next.append(key, value)
+
+    # retrieve an item from our linked list chain
+    def retrieve(self, key):
+        if self.key == key:
+            return self.value
+        elif not self.next:
+            print(f"Hash[{key}] is undefined")
+            return None
+        else:
+            return self.next.retrieve(key)
+
 class HashTable:
     '''
     A hash table that with `capacity` buckets
@@ -16,6 +44,20 @@ class HashTable:
         self.capacity = capacity  # Number of buckets in the hash table
         self.storage = [None] * capacity
 
+    def __str__(self):
+        hashT = {}
+        def append_to_hashT(element, hashT, index):
+            hashT[index].append(element)
+        for i in range(len(self.storage)):
+            hashT[i] = []
+            if self.storage[i]:
+                current_node = self.storage[i]
+                while current_node:
+                    hashT[i].append(current_node)
+                    current_node = current_node.next
+            else:
+                hashT[i] = None
+        return f"{hashT}"
 
     def _hash(self, key):
         '''
@@ -32,7 +74,10 @@ class HashTable:
 
         OPTIONAL STRETCH: Research and implement DJB2
         '''
-        pass
+        h = 5381
+        for k in key:
+            h = ((h << 5) + h) + ord(k)
+        return h%self.capacity
 
 
     def _hash_mod(self, key):
@@ -44,16 +89,19 @@ class HashTable:
 
 
     def insert(self, key, value):
-        '''
-        Store the value with the given key.
+        # if there are no Nones then we resize
+        if not None in self.storage:
+            self.resize()
+        index = self._hash_mod(key)
+        
+        # if we have something at the index, append this value. Using linkedpair.append will
+        # overwrite a value already existing, and traverse over all the values
 
-        Hash collisions should be handled with Linked List Chaining.
-
-        Fill this in.
-        '''
-        pass
-
-
+        if self.storage[index]:
+            self.storage[index].append(key, value)
+        else:
+            self.storage[index] = LinkedPair(key, value)
+       
 
     def remove(self, key):
         '''
@@ -63,28 +111,46 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        index = self._hash_mod(key)
+        # if there is nothing at our index, print our little error message and get out of there!
+        if not self.storage[index]:
+            print(f"Hash[{key}] cannot be deleted: It does not exist")
+            return
+        current_node = self.storage[index]
+        prev_node = None
+        # if there is only one node at this index and it has the key we want we just need to delete it, make the value at this index None
+        if current_node.key == key and not current_node.next:
+            self.storage[index] = None
+        elif current_node.key == key:
+            self.storage[index] = self.storage[index].next
+        else:
+            while current_node:
+                if current_node.key == key:
+                    prev_node.next = current_node.next
+                    return
+                prev_node = current_node
+                current_node = current_node.next
 
 
     def retrieve(self, key):
-        '''
-        Retrieve the value stored with the given key.
-
-        Returns None if the key is not found.
-
-        Fill this in.
-        '''
-        pass
-
+        index = self._hash_mod(key)
+        if self.storage[index]:
+            return self.storage[index].retrieve(key)
+        else:
+            print(f"Hash[{key}] is undefined")
+            return None
 
     def resize(self):
-        '''
-        Doubles the capacity of the hash table and
-        rehash all key/value pairs.
+        self.capacity *= 2
+        old_storage = self.storage
+        self.storage = [None] * self.capacity
 
-        Fill this in.
-        '''
-        pass
+        for node in old_storage:
+            if node:
+                current_node = node
+                while current_node:
+                    self.insert(current_node.key, current_node.value)
+                    current_node = current_node.next
 
 
 
