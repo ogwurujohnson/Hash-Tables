@@ -23,6 +23,14 @@ class LinkedPair:
             self.next = LinkedPair(key, value)
         else:
             self.next.append(key, value)
+    def retrieve(self, key):
+        if self.key == key:
+            return self.value
+        elif not self.next:
+            print(f"Hash[{key}] is undefined")
+            return None
+        else:
+            return self.next.retrieve(key)
 class HashTable:
     '''
     A hash table that with `capacity` buckets
