@@ -86,12 +86,17 @@ class HashTable:
 
 
     def insert(self, key, value):
-
+        # if there are no Nones then we resize
+        if not None in self.storage:
+            self.resize()
         index = self._hash_mod(key)
-        if self.storage[index] is not None:
-            print('warning: index collision')
-            return
 
+        # if we have something at the index, append this value. Using linkedpair.append will
+        # overwrite a value already existing, and traverse over all the values
+
+        if self.storage[index]:
+            self.storage[index].append(key, value)
+        else:
         self.storage[index] = LinkedPair(key, value)
 
     def remove(self, key):
